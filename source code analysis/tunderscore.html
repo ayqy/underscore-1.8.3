@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>test underscore</title>
+    <script>
+    var fn = function(arg) {
+        console.log(this.key, arg);
+    };
+
+    // 干掉原生bind
+    var nBind = Function.prototype.bind;
+    Function.prototype.bind = null;
+    </script>
+    <script src="underscore.js"></script>
+</head>
+
+<body>
+
+<script>
+console.log(_.map([1, 2, 3], function(item) {
+    // 能跳过，但不能跳出
+    if (item === 2) return;
+    return item * 2;
+}));
+
+_.each([1, 2, 3], function(item) {
+    // 能跳过，但不能跳出
+    if (item === 2) return false;
+    console.log(item);
+});
+
+
+console.log('---原生bind');
+nBind.call(fn, {key: 123})(22);
+nBind.call(fn, {key: 123}).call({key: 321}, 22);
+
+
+
+console.log('---_.bind');
+_.bind(fn, {key: 123})(22);
+_.bind(fn, {key: 123}).call({key: 321}, 22);
+// 存在继承时
+
+
+
+console.log(_.template('<div><%= obj.c%><%= obj.a%></div>').source);
+
+
+_.partial((a, b, c, d) => console.log(a, b, c, d), 1, _, _, 4)(2, 3);
+
+// 从右向左管道
+console.log(_.compose(x => x + 1, x => x * 2, x => x - 1)(2));
+
+// befoe
+var fn2 = _.before(3, x => x);
+console.log(fn2(1));    // 1
+console.log(fn2(2));    // 2
+console.log(fn2(3));    // 2
+
+console.log(_.isEqual(NaN, NaN));
+console.log(_.isEqual(-NaN, +NaN));
+console.log(_.isEqual(new Object(NaN), NaN));
+
+var a = {
+    a: {
+        a: {
+            a: {
+                a: {
+                    a: {
+                        a: 1
+                    }
+                }
+            },
+            b: {
+                b: {
+                    b: 2
+                }
+            }
+        }
+    },
+    c: {
+        c : 1
+    }
+};
+a.a.a.d = a;    // 创建循环引用
+var b = {
+    a: {
+        a: {
+            a: {
+                a: {
+                    a: {
+                        a: 1
+                    }
+                }
+            },
+            b: {
+                b: {
+                    b: 2
+                }
+            },
+            d: a    // 循环引用
+        }
+    },
+    c: {
+        c : 1
+    }
+};
+b.a.a.d = a;    // 创建循环引用
+
+console.log(_.isEqual(a, b));
+console.log(_.isEqual({a: {b: 1}}, {a: {b: 1}}));
+
+console.log(_.isNumber(null));
+
+console.log(_.uniqueId());
+console.log(_.uniqueId());
+console.log(_.uniqueId());
+console.log(_.uniqueId());
+
+/* var string = '  ';*/
+/*
+var s = 'https://www.google.com/intl/en /nexus/features.html? //attacker.example.com/nexus/#/help';
+var res = s.indexOf("intl") > -1 ? s.match("/(.*)/nexus/")[0] :
+    "/nexus/";
+console.log(res);
+*/
+// http://www.hack80.com/forum.php?mod=viewthread&tid=21505
+// 页面跳转时的xss漏洞示例
+/* 'file:///Users/ayqy/Desktop/tunderscore.html# javascript:alert(1)'*/
+// location.href = location.hash.slice(1);
+
+// 在模板中声明变量
+console.log(_.template('<p><% var x = 2; %>x = <%= x %></p>')());
+
+// with作用域
+console.log(_.template('<h<%= level %>></h<%= level %>>')({level: 5}));
+</script>
+</body>
+
+</html>
